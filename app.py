@@ -260,7 +260,7 @@ def generate_visualizations(df: pd.DataFrame, numeric_df: pd.DataFrame) -> list[
 	if numeric_df is not None and numeric_df.shape[1] >= 1:
 		cols = list(numeric_df.columns)[:5]
 		fig, ax = plt.subplots(figsize=(max(6, len(cols) * 1.5), 4))
-		ax.boxplot([numeric_df[c].dropna().values for c in cols], labels=cols, patch_artist=True)
+		ax.boxplot([numeric_df[c].dropna().values for c in cols], tick_labels=cols, patch_artist=True)
 		ax.set_title("Boxplots of numeric columns")
 		ax.set_ylabel("Values")
 		images.append({"img": fig_to_base64(fig), "caption": "Boxplots of numeric columns", "x": "Columns", "y": "Values"})

@@ -97,19 +97,29 @@
 					<div class="grid-2">
 						<article class="card">
 							<h4>Column Types</h4>
-							{{
-								('<table><thead><tr><th>Column</th><th>Dtype</th></tr></thead><tbody>' +
-								''.join(['<tr><td>'+r['column']+'</td><td>'+r['dtype']+'</td></tr>' for r in dtypes_rows]) +
-								'</tbody></table>')|safe
-							}}
+							<table>
+								<thead>
+									<tr><th>Column</th><th>Dtype</th></tr>
+								</thead>
+								<tbody>
+									{% for r in dtypes_rows %}
+									<tr><td>{{ r.column }}</td><td>{{ r.dtype }}</td></tr>
+									{% endfor %}
+								</tbody>
+							</table>
 						</article>
 						<article class="card">
 							<h4>Missing Values</h4>
-							{{
-								('<table><thead><tr><th>Column</th><th>Missing</th><th>Percent</th></tr></thead><tbody>' +
-								''.join(['<tr><td>'+r['column']+'</td><td>'+r['missing']|string+'</td><td>'+r['missing_pct']+'</td></tr>' for r in missing_rows]) +
-								'</tbody></table>')|safe
-							}}
+							<table>
+								<thead>
+									<tr><th>Column</th><th>Missing</th><th>Percent</th></tr>
+								</thead>
+								<tbody>
+									{% for r in missing_rows %}
+									<tr><td>{{ r.column }}</td><td>{{ r.missing }}</td><td>{{ r.missing_pct }}</td></tr>
+									{% endfor %}
+								</tbody>
+							</table>
 							<p style="margin-top:.5rem"><strong>Duplicate rows:</strong> {{ duplicates_count }}</p>
 						</article>
 					</div>
