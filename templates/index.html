@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dataset Insights Generator</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	<style>
+		.container { max-width: 900px; margin: 2rem auto; }
+		footer { margin-top: 2rem; color: #666; font-size: 0.9rem; text-align: center; }
+		.card { max-width: 720px; margin: 2rem auto; padding: 2rem; border-radius: 12px; border: 1px solid #eee; background: var(--card-bg, #fff); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+		.header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
+		.header h1 { margin: 0 0 0.5rem; font-weight: 600; }
+		.sub { color: var(--muted, #555); }
+		.dropzone { border: 2px dashed #96b8ff; border-radius: 12px; padding: 2rem; text-align: center; transition: background 0.2s, border-color 0.2s; cursor: pointer; }
+		.dropzone.dragover { background: #f7faff; border-color: #4c7dff; }
+		#fileName { margin-top: 0.5rem; font-size: 0.95rem; color: var(--text, #333); }
+		.actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
+		button[type="submit"] { transition: transform 0.05s ease, opacity 0.2s ease; }
+		button[type="submit"]:hover { transform: translateY(-1px); }
+		.loading { display: none; align-items: center; gap: 0.75rem; justify-content: center; color: #0b3d91; margin-top: 1rem; font-weight: 500; }
+		.loading .spinner { width: 18px; height: 18px; border: 3px solid #cfe0ff; border-top-color: #446bfe; border-radius: 50%; animation: spin 0.8s linear infinite; }
+		@keyframes spin { to { transform: rotate(360deg); } }
+		.progress { display:none; height: 8px; background: #e6efff; border-radius: 999px; overflow: hidden; margin-top: 12px; }
+		.progress .bar { width: 0%; height: 100%; background: linear-gradient(90deg, #4c7dff, #7aa2ff); transition: width 0.2s ease; }
+		.overlay { display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); backdrop-filter: blur(1px); align-items: center; justify-content: center; z-index: 999; }
+		.overlay .panel { background: var(--card-bg, #fff); padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+		.theme-toggle { display:flex; align-items:center; gap:.5rem; }
+	</style>
+</head>
+<body>
+	<main class="container">
+		<div class="header">
+			<div>
+				<h1 class="gradient-text fade-in">Dataset Insights Generator</h1>
+				<p class="sub slide-up">Upload your dataset to get AI insights and visualizations.</p>
+			</div>
+			<div class="theme-toggle">
+				<label for="themeSwitch">Dark mode</label>
+				<input type="checkbox" id="themeSwitch" role="switch">
+			</div>
+		</div>
+
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				<div class="card scale-in">
+					{% for category, message in messages %}
+						<article class="{{ 'secondary' if category == 'warning' else ('contrast' if category == 'error' else '') }}">
+							{{ message }}
+						</article>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
+
+		<form id="uploadForm" class="card slide-up" action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
+			<div id="dropzone" class="dropzone" tabindex="0">
+				<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+					<path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="#4c7dff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+					<path d="M20 16.5V14C20 12.8954 19.1046 12 18 12H6C4.89543 12 4 12.8954 4 14V16.5" stroke="#4c7dff" stroke-width="1.5" stroke-linecap="round"/>
+				</svg>
+				<p><strong>Drag & drop</strong> your CSV/XLS/XLSX file here, or click to browse.</p>
+				<input style="display:none" type="file" id="dataset" name="dataset" accept=".csv,.xls,.xlsx" required>
+				<div id="fileName" aria-live="polite"></div>
+			</div>
+			<div class="actions">
+				<button type="button" id="browseBtn" class="secondary">Choose File</button>
+				<button type="submit" class="button blue">Analyze</button>
+			</div>
+			<div class="progress" id="progress"><div class="bar" id="bar"></div></div>
+			<div id="loading" class="loading" role="status" aria-live="polite">
+				<span class="spinner" aria-hidden="true"></span>
+				<span>Analyzing your dataset, please wait…</span>
+			</div>
+		</form>
+
+		<footer class="fade-in">
+			<p>Max size 20MB. Supported: .csv, .xls, .xlsx</p>
+			<p>Built for Multimeta AI Technical Assessment</p>
+		</footer>
+	</main>
+
+	<div class="overlay" id="overlay"><div class="panel">Processing…</div></div>
+
+	<script>
+		const dropzone = document.getElementById('dropzone');
+		const input = document.getElementById('dataset');
+		const fileName = document.getElementById('fileName');
+		const browseBtn = document.getElementById('browseBtn');
+		const form = document.getElementById('uploadForm');
+		const loading = document.getElementById('loading');
+		const progress = document.getElementById('progress');
+		const bar = document.getElementById('bar');
+		const overlay = document.getElementById('overlay');
+		const themeSwitch = document.getElementById('themeSwitch');
+
+		function applyTheme(theme) {
+			document.documentElement.setAttribute('data-theme', theme);
+			localStorage.setItem('theme', theme);
+			themeSwitch.checked = theme === 'dark';
+		}
+		(function initTheme(){
+			const saved = localStorage.getItem('theme') || 'light';
+			applyTheme(saved);
+		})();
+		themeSwitch.addEventListener('change', () => applyTheme(themeSwitch.checked ? 'dark' : 'light'));
+
+		function setFileDisplay(file) { fileName.textContent = file ? `${file.name}` : ''; }
+		browseBtn.addEventListener('click', () => input.click());
+		dropzone.addEventListener('click', () => input.click());
+		dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+		dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+		dropzone.addEventListener('drop', (e) => {
+			e.preventDefault(); dropzone.classList.remove('dragover');
+			if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+				const f = e.dataTransfer.files[0]; input.files = e.dataTransfer.files; setFileDisplay(f);
+			}
+		});
+		input.addEventListener('change', () => setFileDisplay(input.files[0]));
+
+		form.addEventListener('submit', () => {
+			loading.style.display = 'flex';
+			progress.style.display = 'block';
+			overlay.style.display = 'flex';
+			let pct = 0;
+			const id = setInterval(() => { pct = Math.min(98, pct + Math.random()*8); bar.style.width = pct + '%'; }, 200);
+			window.addEventListener('beforeunload', () => clearInterval(id));
+		});
+	</script>
+</body>
+</html>

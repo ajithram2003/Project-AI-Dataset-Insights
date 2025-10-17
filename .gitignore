@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tooling
+.idea/
+.vscode/
+
+# Local env
+.env
+
+# Uploads and generated images
+uploads/*
+!uploads/.gitkeep
+
+# Matplotlib cache
+.matplotlib/
+
