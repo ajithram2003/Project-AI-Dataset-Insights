@@ -11,14 +11,13 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 	<style>
 		.container { max-width: 900px; margin: 2rem auto; }
-		footer { margin-top: 2rem; color: #666; font-size: 0.9rem; text-align: center; }
 		.card { max-width: 720px; margin: 2rem auto; padding: 2rem; border-radius: 12px; border: 1px solid #eee; background: var(--card-bg, #fff); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
 		.header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
 		.header h1 { margin: 0 0 0.5rem; font-weight: 600; }
-		.sub { color: var(--muted, #555); }
+		.sub { color: var(--muted, #555); text-align: center; }
 		.dropzone { border: 2px dashed #96b8ff; border-radius: 12px; padding: 2rem; text-align: center; transition: background 0.2s, border-color 0.2s; cursor: pointer; }
 		.dropzone.dragover { background: #f7faff; border-color: #4c7dff; }
-		#fileName { margin-top: 0.5rem; font-size: 0.95rem; color: var(--text, #333); }
+		#fileName { margin-top: 0.5rem; font-size: 0.95rem; color: var(--text, #333); text-align: center; }
 		.actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 1rem; }
 		button[type="submit"] { transition: transform 0.05s ease, opacity 0.2s ease; }
 		button[type="submit"]:hover { transform: translateY(-1px); }
@@ -35,9 +34,9 @@
 <body>
 	<main class="container">
 		<div class="header">
-			<div>
+			<div style="flex:1; text-align:center;">
 				<h1 class="gradient-text fade-in">Dataset Insights Generator</h1>
-				<p class="sub slide-up">Upload your dataset to get AI insights and visualizations.</p>
+				<p class="sub">Upload your dataset to get AI insights and visualizations.</p>
 			</div>
 			<div class="theme-toggle">
 				<label for="themeSwitch">Dark mode</label>
@@ -47,7 +46,7 @@
 
 		{% with messages = get_flashed_messages(with_categories=true) %}
 			{% if messages %}
-				<div class="card scale-in">
+				<div class="card fade-in">
 					{% for category, message in messages %}
 						<article class="{{ 'secondary' if category == 'warning' else ('contrast' if category == 'error' else '') }}">
 							{{ message }}
@@ -57,7 +56,7 @@
 			{% endif %}
 		{% endwith %}
 
-		<form id="uploadForm" class="card slide-up" action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
+		<form id="uploadForm" class="card fade-in" action="{{ url_for('analyze') }}" method="post" enctype="multipart/form-data">
 			<div id="dropzone" class="dropzone" tabindex="0">
 				<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 					<path d="M12 16V8M12 8L9 11M12 8L15 11" stroke="#4c7dff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -77,11 +76,6 @@
 				<span>Analyzing your dataset, please wait…</span>
 			</div>
 		</form>
-
-		<footer class="fade-in">
-			<p>Max size 20MB. Supported: .csv, .xls, .xlsx</p>
-			<p>Built for Multimeta AI Technical Assessment</p>
-		</footer>
 	</main>
 
 	<div class="overlay" id="overlay"><div class="panel">Processing…</div></div>

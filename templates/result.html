@@ -11,127 +11,80 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 	<style>
 		.container { max-width: 1200px; margin: 2rem auto; }
-		.dashboard { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
-		@media (min-width: 1000px) { .dashboard { grid-template-columns: 2fr 1fr; } }
-		img.chart { width: 100%; height: auto; background: #fff; border: 1px solid #eee; padding: 0.5rem; border-radius: 12px; cursor: zoom-in; box-shadow: var(--shadow); }
-		.summary { background: var(--card-bg); border: 1px solid #e2ecff; border-radius: 14px; padding: 1rem 1.25rem; box-shadow: var(--shadow); }
-		.section { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1rem 1.25rem; box-shadow: var(--shadow); }
-		.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
-		@media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-		.stat-card { background: var(--card-bg); border: 1px solid #eee; border-radius: 12px; padding: .75rem; display:flex; align-items:center; gap:.6rem; box-shadow: var(--shadow); }
-		.stat-icon { width: 28px; height: 28px; border-radius: 8px; display:flex; align-items:center; justify-content:center; color:#fff; }
-		.icon-blue { background: #6b8bff; }
-		.icon-green { background: #2ecc71; }
-		.icon-purple { background: #9b6bff; }
-		.icon-orange { background: #ff9f43; }
-		.meta { text-align: right; color: #667; font-size: 0.85rem; margin-top: .25rem; }
-		.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+		img.chart { width: 100%; height: auto; background: var(--card-bg); border: 1px solid var(--table-border); padding: 0.5rem; border-radius: 12px; box-shadow: var(--shadow); }
+		.section { background: var(--card-bg); border: 1px solid var(--table-border); border-radius: 14px; padding: 1rem 1.25rem; box-shadow: var(--shadow); }
+		.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.1rem; }
 		@media (max-width: 1000px) { .grid-2 { grid-template-columns: 1fr; } }
-		.cards { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-		.actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .8rem; }
-		@media (max-width: 700px) { .actions { grid-template-columns: 1fr; } }
-		.box-btn { display:block; text-align:center; padding: .9rem 1rem; border-radius: 12px; background: #f7faff; border: 1px solid #dbe7ff; box-shadow: var(--shadow); transition: transform .12s ease, box-shadow .2s ease; }
-		.box-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,0.12); }
-		.box-btn.blue { background: #ebf1ff; border-color: #cfe0ff; }
-		.box-btn.green { background: #e8fbf0; border-color: #c9f0da; }
-		.box-btn.orange { background: #fff2e4; border-color: #ffd7b0; }
 		.fade-in { animation: fade .45s ease both; }
+		.fade-up { animation: fadeUp .6s ease both; }
 		@keyframes fade { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
-		.header-row { display:flex; align-items:center; justify-content: space-between; gap:.75rem; flex-wrap: wrap; }
-		.meta-top { color:#667; font-size:.9rem; }
+		@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+		.table-wrap { overflow-x: auto; }
+		table.stats { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .95rem; }
+		table.stats th, table.stats td { padding: .6rem .7rem; border-bottom: 1px solid var(--table-border); }
+		table.stats thead th { text-align: left; background: var(--table-head-bg); border-bottom: 2px solid var(--table-border); }
+		table.stats tbody tr:nth-child(even) { background: var(--table-row-even); }
+		table.stats tbody tr:hover { background: var(--table-row-hover); }
+		.meta { text-align: right; color: #667; font-size: 0.85rem; margin-top: .25rem; }
+		.nav { display:flex; align-items:center; justify-content:space-between; gap: .75rem; background: var(--card-bg); border:1px solid var(--table-border); border-radius:14px; padding:.8rem 1rem; box-shadow: var(--shadow); }
+		.nav .left { font-weight:600; color: var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+		.nav .right { display:flex; gap:.6rem; }
+		.nav .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.55rem .9rem; border-radius:12px; border:1px solid #cfe0ff; background:#ebf1ff; color:#0d254c; text-decoration:none; transition: transform .12s ease, box-shadow .25s ease, background .3s ease; }
+		.nav .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,0.12); }
+		.nav .btn.primary { background: linear-gradient(90deg, var(--brand-accent), var(--brand-accent-2)); border-color: transparent; color:#fff; }
 	</style>
 </head>
 <body>
+	<script>
+		// Persist theme from upload page
+		(function(){
+			const saved = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', saved);
+		})();
+	</script>
 	<main class="container">
-		<div class="header-row">
-			<div>
-				<h1 class="gradient-text fade-in">Results for {{ filename }}</h1>
-				<p class="meta-top">Uploaded at {{ uploaded_at }}</p>
+		<div class="nav fade-in">
+			<div class="left" title="{{ filename }}">{{ filename }}</div>
+			<div class="right">
+				<a class="btn" href="{{ url_for('index') }}">Upload Another File</a>
+				<a class="btn" href="{{ url_for('download_stats') }}">Download Stats</a>
+				<a class="btn primary" href="#" onclick="window.print(); return false;" title="Download AI Report">Download Report</a>
 			</div>
-			<div class="actions" style="display:flex; gap:.5rem;">
-				<a class="box-btn blue" href="{{ url_for('index') }}">← Upload Another File</a>
-				<a class="box-btn" href="{{ url_for('download_stats') }}">Download Stats CSV</a>
-				<button onclick="window.print()" class="box-btn orange">Download Report</button>
-			</div>
-		</div>
-
-		<div class="dashboard">
-			<section class="summary fade-in">
-				<h2>AI‑Generated Insights</h2>
-				<pre id="summaryText">{{ summary }}</pre>
-				<div style="text-align:right; margin-top:.5rem;"><button id="copyBtn" class="secondary">Copy summary</button></div>
-			</section>
-
-			<section class="cards fade-in">
-				<div class="section">
-					<h3>Statistics Summary</h3>
-					<div class="stats-grid">
-						{% for row in stats_rows %}
-						<div class="stat-card">
-							<div class="stat-icon icon-blue" title="Mean (μ)">μ</div>
-							<div><div><strong>{{ row.column }}</strong></div><div>Mean: {{ row.mean }}</div></div>
-						</div>
-						<div class="stat-card">
-							<div class="stat-icon icon-green" title="Median">M</div>
-							<div><div><strong>{{ row.column }}</strong></div><div>Median: {{ row.median }}</div></div>
-						</div>
-						<div class="stat-card">
-							<div class="stat-icon icon-purple" title="Mode">Mo</div>
-							<div><div><strong>{{ row.column }}</strong></div><div>Mode: {{ row.mode }}</div></div>
-						</div>
-						<div class="stat-card">
-							<div class="stat-icon icon-orange" title="Std Dev (σ)">σ</div>
-							<div><div><strong>{{ row.column }}</strong></div><div>Std: {{ row.std }}</div></div>
-						</div>
-						{% endfor %}
-					</div>
-				</div>
-
-				<div class="section">
-					<h3>Data Preview</h3>
-					<div class="card" style="padding:.5rem;">{{ preview_html|safe }}</div>
-				</div>
-
-				<div class="section">
-					<h3>Schema & Data Quality</h3>
-					<div class="grid-2">
-						<article class="card">
-							<h4>Column Types</h4>
-							<table>
-								<thead>
-									<tr><th>Column</th><th>Dtype</th></tr>
-								</thead>
-								<tbody>
-									{% for r in dtypes_rows %}
-									<tr><td>{{ r.column }}</td><td>{{ r.dtype }}</td></tr>
-									{% endfor %}
-								</tbody>
-							</table>
-						</article>
-						<article class="card">
-							<h4>Missing Values</h4>
-							<table>
-								<thead>
-									<tr><th>Column</th><th>Missing</th><th>Percent</th></tr>
-								</thead>
-								<tbody>
-									{% for r in missing_rows %}
-									<tr><td>{{ r.column }}</td><td>{{ r.missing }}</td><td>{{ r.missing_pct }}</td></tr>
-									{% endfor %}
-								</tbody>
-							</table>
-							<p style="margin-top:.5rem"><strong>Duplicate rows:</strong> {{ duplicates_count }}</p>
-						</article>
-					</div>
-				</div>
-			</section>
 		</div>
 
 		<section class="section fade-in" style="margin-top:1rem;">
-			<h2>Data Visualizations</h2>
+			<h2 class="section-title">AI Insights Summary</h2>
+			<pre id="summaryText" style="white-space:pre-wrap; margin:0;">{{ summary }}</pre>
+		</section>
+
+		<section class="section fade-in" style="margin-top:1rem;">
+			<h2 class="section-title">Statistical Summary</h2>
+			<div class="table-wrap">
+				<table class="stats">
+					<thead>
+						<tr>
+							<th>Metric</th>
+							<th>Column</th>
+							<th>Value</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for row in stats_rows %}
+						<tr><td>Mean</td><td>{{ row.column }}</td><td>{{ row.mean }}</td></tr>
+						<tr><td>Median</td><td>{{ row.column }}</td><td>{{ row.median }}</td></tr>
+						<tr><td>Mode</td><td>{{ row.column }}</td><td>{{ row.mode }}</td></tr>
+						<tr><td>Std Dev</td><td>{{ row.column }}</td><td>{{ row.std }}</td></tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</section>
+
+		<section class="section" style="margin-top:1rem;">
+			<h2 class="section-title">Data Visualizations</h2>
 			<div class="grid-2" id="charts">
 				{% for item in images %}
-				<figure class="card fade-in">
+				<figure class="card fade-up" style="animation-delay: {{ (loop.index0 * 0.06) | round(2) }}s;">
 					<img class="chart" src="{{ item.img }}" alt="Chart {{ loop.index }}">
 					<figcaption>{{ item.caption }}</figcaption>
 					<div class="meta">x: {{ item.x }} | y: {{ item.y }}</div>
@@ -139,30 +92,11 @@
 				{% endfor %}
 			</div>
 		</section>
-
-		<div class="actions" style="margin-top:1rem;">
-			<a class="box-btn blue" href="{{ url_for('index') }}">← Upload Another File</a>
-			<a class="box-btn" href="{{ url_for('download_stats') }}">Download Stats CSV</a>
-			<button onclick="window.print()" class="box-btn orange">Download Report</button>
-		</div>
-
-		<footer style="text-align:center; margin-top:1.25rem; color:#667;">
-			<p>Built for Multimeta AI Technical Assessment</p>
-		</footer>
 	</main>
 
-	<div class="modal" id="modal"><img id="modalImg" alt="Zoomed chart"></div>
+	<div class="modal" id="modal" style="display:none; position: fixed; inset:0; background: rgba(0,0,0,0.65); align-items:center; justify-content:center; z-index: 1000;"><img id="modalImg" alt="Zoomed chart" style="max-width: 95vw; max-height: 90vh; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);"></div>
 
 	<script>
-		// Copy summary
-		const copyBtn = document.getElementById('copyBtn');
-		const summaryText = document.getElementById('summaryText');
-		copyBtn.addEventListener('click', async () => {
-			try { await navigator.clipboard.writeText(summaryText.textContent); copyBtn.textContent = 'Copied!'; setTimeout(() => copyBtn.textContent = 'Copy summary', 1200); }
-			catch (e) { copyBtn.textContent = 'Copy failed'; setTimeout(() => copyBtn.textContent = 'Copy summary', 1200); }
-		});
-
-		// Modal zoom for charts
 		const modal = document.getElementById('modal');
 		const modalImg = document.getElementById('modalImg');
 		document.getElementById('charts').addEventListener('click', (e) => {
