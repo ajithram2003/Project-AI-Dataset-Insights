@@ -423,8 +423,10 @@ def fmt_float(val) -> str:
 		return str(val)
 
 
+# Create app instance for Vercel
+app = create_app()
+
 if __name__ == "__main__":
 	# Running locally: python app.py
-	app = create_app()
 	port = int(os.environ.get("PORT", 5000))
 	app.run(host="0.0.0.0", port=port, debug=True)
