@@ -17,7 +17,8 @@ import matplotlib.pyplot as plt
 
 # Configuration
 ALLOWED_EXTENSIONS = {"csv", "xls", "xlsx"}
-MAX_CONTENT_LENGTH_MB = 20
+# Vercel has 4.5MB payload limit, so we'll use 4MB to be safe
+MAX_CONTENT_LENGTH_MB = 4
 
 # In-memory cache for last computed stats (for CSV export)
 LAST_STATS_CSV: pd.DataFrame | None = None
@@ -29,11 +30,9 @@ def create_app() -> Flask:
 	# Secret key for flashing messages (override in production)
 	app.config["SECRET_KEY"] = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
 
-	# Uploads
-	project_root = os.path.dirname(os.path.abspath(__file__))
-	uploads_dir = os.path.join(project_root, "uploads")
-	os.makedirs(uploads_dir, exist_ok=True)
-	app.config["UPLOAD_FOLDER"] = uploads_dir
+	# Uploads - Use temp directory for Vercel compatibility
+	import tempfile
+	app.config["UPLOAD_FOLDER"] = tempfile.gettempdir()
 	app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH_MB * 1024 * 1024
 
 	@app.route("/")
@@ -57,7 +56,12 @@ def create_app() -> Flask:
 			return redirect(url_for("index"))
 
 		filename = secure_filename(file.filename)
-		file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+		# Use temporary file for Vercel compatibility
+		import tempfile
+		temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1])
+		file_path = temp_file.name
+		temp_file.close()
+		
 		try:
 			file.save(file_path)
 		except Exception as e:
@@ -115,6 +119,12 @@ def create_app() -> Flask:
 
 		# Cache CSV for download
 		LAST_STATS_CSV = pd.DataFrame(stats_rows)
+
+		# Clean up temporary file
+		try:
+			os.unlink(file_path)
+		except:
+			pass  # Ignore cleanup errors
 
 		return render_template(
 			"result.html",
