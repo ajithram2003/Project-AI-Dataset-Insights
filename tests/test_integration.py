@@ -43,8 +43,10 @@ class TestIntegration(unittest.TestCase):
                                           data={'dataset': (f, 'test_data.csv')},
                                           content_type='multipart/form-data')
                 
-            # Should redirect to result page
-            self.assertEqual(response.status_code, 302)
+            # Should return result page (200) with analysis content
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Analysis Results', response.data)
+            self.assertIn(b'Statistical Summary', response.data)
             
         finally:
             os.unlink(temp_path)

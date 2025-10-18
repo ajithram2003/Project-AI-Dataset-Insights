@@ -179,10 +179,16 @@ def compute_basic_stats(numeric_df: pd.DataFrame) -> dict:
 		series = numeric_df[column].dropna()
 		if series.empty:
 			continue
+		
+		# Check if the series is actually numeric
+		if not pd.api.types.is_numeric_dtype(series):
+			continue
+			
 		try:
 			col_mode = series.mode().iloc[0] if not series.mode().empty else np.nan
 		except Exception:
 			col_mode = np.nan
+			
 		stats[column] = {
 			"mean": float(series.mean()) if len(series) else np.nan,
 			"median": float(series.median()) if len(series) else np.nan,
@@ -428,7 +434,8 @@ def fmt_float(val) -> str:
 	if val is None or (isinstance(val, float) and (np.isnan(val) or np.isinf(val))):
 		return "NA"
 	try:
-		return f"{float(val):.4g}"
+		# Use .4f for 4 decimal places precision
+		return f"{float(val):.4f}"
 	except Exception:
 		return str(val)
 
