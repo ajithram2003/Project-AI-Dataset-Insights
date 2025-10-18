@@ -14,14 +14,18 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# Serverless optimizations
+import warnings
+warnings.filterwarnings("ignore")  # Reduce log noise in serverless
+
 
 # Configuration
 ALLOWED_EXTENSIONS = {"csv", "xls", "xlsx"}
 # Vercel has 4.5MB payload limit, so we'll use 4MB to be safe
 MAX_CONTENT_LENGTH_MB = 4
 
-# In-memory cache for last computed stats (for CSV export)
-LAST_STATS_CSV: pd.DataFrame | None = None
+# Note: Global variables don't persist in serverless functions
+# We'll need to handle CSV export differently
 
 
 def create_app() -> Flask:
@@ -38,10 +42,14 @@ def create_app() -> Flask:
 	@app.route("/")
 	def index():
 		return render_template("index.html")
+	
+	@app.route("/health")
+	def health():
+		"""Health check endpoint for serverless functions"""
+		return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 	@app.route("/analyze", methods=["POST"])
 	def analyze():
-		global LAST_STATS_CSV
 		if "dataset" not in request.files:
 			flash("No file part in the request.", "error")
 			return redirect(url_for("index"))
@@ -117,8 +125,8 @@ def create_app() -> Flask:
 				"std": fmt_float(s.get("std")),
 			})
 
-		# Cache CSV for download
-		LAST_STATS_CSV = pd.DataFrame(stats_rows)
+		# Note: In serverless, we can't cache data between requests
+		# CSV download will need to be handled differently
 
 		# Clean up temporary file
 		try:
@@ -141,19 +149,10 @@ def create_app() -> Flask:
 
 	@app.route("/download_stats")
 	def download_stats():
-		global LAST_STATS_CSV
-		if LAST_STATS_CSV is None or LAST_STATS_CSV.empty:
-			flash("No stats available to download. Please analyze a dataset first.", "warning")
-			return redirect(url_for("index"))
-		buffer = io.BytesIO()
-		LAST_STATS_CSV.to_csv(buffer, index=False)
-		buffer.seek(0)
-		return send_file(
-			buffer,
-			as_attachment=True,
-			mimetype="text/csv",
-			download_name="stats_summary.csv",
-		)
+		# In serverless functions, we can't persist data between requests
+		# This endpoint will return an error message
+		flash("CSV download not available in serverless mode. Please use the print function to save the report.", "warning")
+		return redirect(url_for("index"))
 
 	return app
 
