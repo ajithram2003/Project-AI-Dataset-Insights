@@ -87,15 +87,6 @@ The AI Dataset Insights Generator is designed to help data analysts, researchers
 6. **Access the application**
    Open your browser and navigate to `http://localhost:5000`
 
-### Running Tests
-```bash
-# Run all tests
-python -m unittest discover tests -v
-
-# Run specific test file
-python -m unittest tests.test_app -v
-```
-
 ## 🔌 API Endpoints
 
 | Method | Endpoint | Description |
