@@ -146,14 +146,17 @@ python -m unittest tests.test_app -v
 
 #### 🏠 Homepage - File Upload Interface
 ![Homepage](https://github.com/ajithram2003/Project-AI-Dataset-Insights/blob/main/docs/images/homepage.jpeg?raw=true)
+
 *Clean, modern interface with drag-and-drop file upload functionality*
 
 #### 📊 Analysis Results - AI Insights and Statistics
 ![Analysis Results](https://github.com/ajithram2003/Project-AI-Dataset-Insights/blob/main/docs/images/analysis-results.jpeg?raw=true)
+
 *Comprehensive analysis showing AI-generated insights and statistical summaries*
 
 #### 📈 Data Visualizations Dashboard
 ![Data Visualizations](https://github.com/ajithram2003/Project-AI-Dataset-Insights/blob/main/docs/images/data-visualizations.jpeg?raw=true)
+
 *Rich collection of charts including bar charts, line charts, histograms, and correlation heatmaps*
 
 ### Key Features Showcased:
