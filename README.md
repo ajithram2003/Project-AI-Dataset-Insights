@@ -1,4 +1,4 @@
-# AI Dataset Insights Generator
+﻿# AI Dataset Insights Generator
 
 A powerful web application that transforms raw datasets into actionable insights using AI-powered analysis and beautiful visualizations.
 
@@ -39,11 +39,7 @@ The AI Dataset Insights Generator is designed to help data analysts, researchers
 
 ### Deployment
 - **Vercel** - Serverless deployment platform
-- **Gunicorn** - WSGI HTTP server (production)
 
-### Development Tools
-- **unittest** - Testing framework
-- **pytest** - Advanced testing (optional)
 
 ## 🚀 Setup and Installation Instructions
 
@@ -100,39 +96,13 @@ python -m unittest discover tests -v
 python -m unittest tests.test_app -v
 ```
 
-## 🔌 API Endpoints Documentation
+## 🔌 API Endpoints
 
-### Web Routes
-
-| Method | Endpoint | Description | Parameters |
-|--------|----------|-------------|------------|
-| `GET` | `/` | Home page with file upload form | None |
-| `POST` | `/analyze` | Process uploaded dataset | `dataset` (file) |
-| `GET` | `/download_stats` | Download statistical summary as CSV | None |
-
-### Request/Response Examples
-
-#### File Upload (`POST /analyze`)
-**Request:**
-```http
-POST /analyze
-Content-Type: multipart/form-data
-
-dataset: [file] (CSV/XLS/XLSX)
-```
-
-**Response:**
-```html
-<!-- Returns result.html template with analysis results -->
-```
-
-#### Download Stats (`GET /download_stats`)
-**Response:**
-```csv
-column,mean,median,mode,std
-sales,200.0000,200.0000,150.0000,70.7107
-profit,40.0000,40.0000,30.0000,14.1421
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Home page with file upload form |
+| `POST` | `/analyze` | Process uploaded dataset |
+| `GET` | `/health` | Health check endpoint |
 
 ## 🚀 Deployment Instructions
 
@@ -155,113 +125,47 @@ profit,40.0000,40.0000,30.0000,14.1421
    - The `vercel.json` configuration will be used
    - Your app will be deployed and accessible via Vercel URL
 
-### Manual Deployment
-
-1. **Prepare for production**
-   ```bash
-   # Install production dependencies
-   pip install gunicorn
-   
-   # Run with Gunicorn
-   gunicorn --bind 0.0.0.0:8000 src.app:app
-   ```
-
-2. **Environment setup**
-   - Set production environment variables
-   - Configure your web server (Nginx, Apache)
-   - Set up SSL certificates
-
-### Docker Deployment (Optional)
-
-```dockerfile
-FROM python:3.9-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-EXPOSE 8000
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "src.app:app"]
-```
 
 ## ⚠️ Known Limitations and Future Improvements
 
 ### Current Limitations
 - **File Size**: Maximum 4MB file size limit (Vercel constraint)
 - **File Types**: Only supports CSV, XLS, and XLSX formats
-- **Concurrent Users**: Limited by Vercel's serverless architecture
+- **Serverless Architecture**: Each request is independent (no session persistence)
 - **Data Privacy**: Files are processed in memory (not stored)
 - **AI Dependencies**: Requires OpenAI API key for AI insights
-
-### Planned Future Improvements
-- [ ] **Enhanced File Support**: Add support for JSON, Parquet, and other formats
-- [ ] **Advanced ML Models**: Integrate scikit-learn for clustering and classification
-- [ ] **User Authentication**: Add user accounts and analysis history
-- [ ] **Collaborative Features**: Share analyses and add comments
-- [ ] **Custom Visualizations**: Allow users to create custom chart types
-- [ ] **Data Preprocessing**: Add data cleaning and transformation tools
-- [ ] **API Endpoints**: RESTful API for programmatic access
-- [ ] **Real-time Collaboration**: Multiple users working on same analysis
-- [ ] **Advanced Statistics**: More sophisticated statistical tests
-- [ ] **Export Formats**: PDF reports, PowerPoint presentations
-
-### Performance Optimizations
-- [ ] **Caching**: Implement Redis for faster repeated analyses
-- [ ] **Async Processing**: Background processing for large datasets
-- [ ] **CDN Integration**: Faster static asset delivery
-- [ ] **Database Integration**: Persistent storage for analysis results
+- **CSV Download**: Not available in serverless mode (use print function instead)
+- **Cold Starts**: First request after inactivity may take 1-3 seconds
 
 ## 📸 Screenshots and Demo
 
 ### Live Demo
-🔗 **Demo Link**: [Add your Vercel deployment URL here]
+🔗 **Demo Link**: https://project-ai-dataset-insights.vercel.app/
 
 ### Screenshots
-*Screenshots will be added here showing:*
-- 📱 **Homepage**: Clean, modern interface with drag-and-drop upload
-- 📊 **Analysis Results**: Rich visualizations and AI insights
-- 📈 **Charts**: Various chart types including histograms, scatter plots, heatmaps
-- 🌙 **Dark Mode**: Beautiful dark theme implementation
-- 📱 **Mobile View**: Responsive design on mobile devices
 
-### Video Demo
-*[Add link to video demonstration here]*
+#### 🏠 Homepage - File Upload Interface
+![Homepage](https://github.com/ajithram2003/Project-AI-Dataset-Insights/blob/main/docs/images/homepage.jpeg?raw=true)
+*Clean, modern interface with drag-and-drop file upload functionality*
 
-## 🤝 Contributing
+#### 📊 Analysis Results - AI Insights and Statistics
+![Analysis Results](https://github.com/ajithram2003/Project-AI-Dataset-Insights/blob/main/docs/images/analysis-results.jpeg?raw=true)
+*Comprehensive analysis showing AI-generated insights and statistical summaries*
 
-We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+#### 📈 Data Visualizations Dashboard
+![Data Visualizations](https://github.com/ajithram2003/Project-AI-Dataset-Insights/blob/main/docs/images/data-visualizations.jpeg?raw=true)
+*Rich collection of charts including bar charts, line charts, histograms, and correlation heatmaps*
 
-### Development Guidelines
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Key Features Showcased:
+- 🎨 **Modern UI Design**: Clean, professional interface with gradient themes
+- 📁 **Drag & Drop Upload**: Intuitive file upload with progress indicators
+- 🧠 **AI-Powered Insights**: Intelligent analysis and recommendations
+- 📊 **Rich Visualizations**: Multiple chart types for comprehensive data understanding
+- 📱 **Responsive Design**: Works seamlessly on desktop and mobile devices
+- 🌙 **Theme Switching**: Dark/Light mode toggle for user preference
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👨‍💻 Author
 
 **Ajith Ram**
 - GitHub: [@ajithram2003](https://github.com/ajithram2003)
-- LinkedIn: [Add your LinkedIn profile]
-- Email: [Add your email]
-
-## 🙏 Acknowledgments
-
-- OpenAI for providing the GPT API for AI insights
-- The Flask community for excellent documentation
-- Vercel for seamless deployment platform
-- All contributors and testers
-
----
-
-⭐ **Star this repository if you found it helpful!**
-
-📧 **Contact**: [Add your contact information]
-
-🐛 **Report Issues**: [GitHub Issues](https://github.com/ajithram2003/Project-AI-Dataset-Insights/issues)
