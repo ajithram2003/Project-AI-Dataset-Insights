@@ -151,16 +151,8 @@ The AI Dataset Insights Generator is designed to help data analysts, researchers
 
 *Rich collection of charts including bar charts, line charts, histograms, and correlation heatmaps*
 
-### Key Features Showcased:
-- 🎨 **Modern UI Design**: Clean, professional interface with gradient themes
-- 📁 **Drag & Drop Upload**: Intuitive file upload with progress indicators
-- 🧠 **AI-Powered Insights**: Intelligent analysis and recommendations
-- 📊 **Rich Visualizations**: Multiple chart types for comprehensive data understanding
-- 📱 **Responsive Design**: Works seamlessly on desktop and mobile devices
-- 🌙 **Theme Switching**: Dark/Light mode toggle for user preference
-
 
 ## 👨‍💻 Author
 
-**Ajith Ram**
+**Ajithram**
 - GitHub: [@ajithram2003](https://github.com/ajithram2003)
