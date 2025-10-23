@@ -94,6 +94,7 @@ The AI Dataset Insights Generator is designed to help data analysts, researchers
 | `GET` | `/` | Home page with file upload form |
 | `POST` | `/analyze` | Process uploaded dataset |
 | `GET` | `/health` | Health check endpoint |
+| `GET` | `/download_stats` | CSV download |
 
 ## 🚀 Deployment Instructions
 
